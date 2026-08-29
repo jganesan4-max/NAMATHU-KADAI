@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>பஜார் கடைகள் - Bazaar Shops</title>
+<meta name="theme-color" content="#7A2A1D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --jute:#D9C49C;
+    --jute-dark:#C7AF83;
+    --maroon:#7A2A1D;
+    --maroon-dark:#5E1F14;
+    --mustard:#C97F0A;
+    --mustard-dark:#9C6106;
+    --green:#43602F;
+    --green-dark:#334A23;
+    --ink:#2A2116;
+    --paper:#FBF6E9;
+    --line:#B8A276;
+    --whatsapp:#25D366;
+    --whatsapp-dark:#1AA34A;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;min-height:100%;}
+  body{
+    background-color:var(--jute);
+    background-image:
+      repeating-linear-gradient(45deg, rgba(122,42,29,0.06) 0px, rgba(122,42,29,0.06) 2px, transparent 2px, transparent 9px),
+      repeating-linear-gradient(-45deg, rgba(122,42,29,0.05) 0px, rgba(122,42,29,0.05) 2px, transparent 2px, transparent 9px);
+    color:var(--ink);
+    font-family:'Noto Sans Tamil','Noto Sans',sans-serif;
+    font-size:17px;
+    line-height:1.5;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:110px;}
+
+  /* ---- Directory (list of shops) ---- */
+  .directory-header{padding:30px 22px 16px;text-align:center;}
+  .directory-header .eyebrow{font-size:13px;letter-spacing:3px;color:var(--maroon-dark);font-weight:700;text-transform:uppercase;}
+  .directory-header h1{
+    font-family:'Baloo Thambi 2',sans-serif;font-size:30px;font-weight:800;color:var(--ink);margin:8px 0 6px;
+  }
+  .directory-header p{color:#5b5140;font-size:14.5px;margin:0;max-width:340px;margin:0 auto;}
+
+  .signboard-list{padding:10px 18px 6px;display:flex;flex-direction:column;gap:16px;}
+  .signboard{
+    display:block;text-decoration:none;border-radius:8px;
+    padding:20px 22px;position:relative;overflow:hidden;
+    box-shadow:0 4px 0 rgba(0,0,0,0.22), 0 8px 16px rgba(0,0,0,0.18);
+    border:3px solid rgba(0,0,0,0.18);
+  }
+  .signboard::after{
+    content:"";position:absolute;left:0;right:0;top:0;height:6px;
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.35) 0 10px, transparent 10px 20px);
+    opacity:0.5;
+  }
+  .signboard.c-maroon{background:var(--maroon);}
+  .signboard.c-green{background:var(--green);}
+  .signboard.c-mustard{background:var(--mustard-dark);}
+  .signboard .shop-name{
+    font-family:'Baloo Thambi 2',sans-serif;font-weight:800;font-size:22px;color:var(--paper);
+    text-shadow:0 2px 0 rgba(0,0,0,0.3);padding-right:34px;
+  }
+  .signboard .shop-tag{color:rgba(251,246,233,0.8);font-size:13.5px;margin-top:4px;}
+  .signboard .shop-arrow{
+    position:absolute;right:18px;top:50%;transform:translateY(-50%);
+    font-size:24px;color:var(--paper);
+  }
+
+  /* ---- hanging price-tag motif ---- */
+  .price-tag{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--mustard);color:var(--ink);font-weight:800;
+    padding:4px 11px 4px 8px;border-radius:3px 9px 9px 3px;
+    font-size:14.5px;white-space:nowrap;box-shadow:0 1px 0 rgba(0,0,0,0.15);
+  }
+  .price-tag::before{
+    content:"";width:6px;height:6px;border-radius:50%;
+    background:var(--paper);border:1px solid rgba(0,0,0,0.3);flex-shrink:0;
+  }
+
+  /* ---- Shop catalog page ---- */
+  .shop-header{
+    position:sticky;top:0;z-index:20;background:var(--maroon);color:var(--paper);
+    padding:16px 20px 14px;box-shadow:0 3px 10px rgba(0,0,0,0.25);
+  }
+  .shop-header .back-link{color:rgba(251,246,233,0.85);text-decoration:none;font-size:13.5px;display:inline-block;margin-bottom:6px;}
+  .shop-header h1{font-family:'Baloo Thambi 2',sans-serif;font-size:24px;font-weight:800;margin:0;}
+  .shop-header .shop-sub{font-size:13px;color:rgba(251,246,233,0.7);margin-top:2px;}
+
+  .item-list{padding:16px 18px 0;display:flex;flex-direction:column;gap:11px;}
+  .item-row{
+    background:var(--paper);border:2px solid var(--line);border-radius:9px;
+    padding:14px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .item-row .item-name{font-size:16.5px;font-weight:600;flex:1;}
+  .item-row .item-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+
+  .qty-stepper{display:flex;align-items:center;gap:9px;}
+  .qty-stepper button{
+    width:34px;height:34px;border-radius:8px;border:2px solid var(--maroon);
+    background:#fff;color:var(--maroon);font-size:19px;font-weight:800;line-height:1;
+  }
+  .qty-stepper button:active{background:var(--maroon);color:#fff;}
+  .qty-stepper .qty-val{min-width:20px;text-align:center;font-weight:800;font-size:16px;}
+
+  .add-btn{
+    background:var(--maroon);color:var(--paper);border:none;border-radius:8px;
+    padding:9px 16px;font-weight:700;font-size:14.5px;font-family:'Baloo Thambi 2',sans-serif;
+  }
+  .add-btn:active{background:var(--maroon-dark);}
+
+  .empty-note{text-align:center;color:#5b5140;padding:40px 24px;font-size:15px;}
+  .empty-note a{color:var(--maroon);font-weight:700;}
+
+  /* ---- Cart bar ---- */
+  .cart-bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:520px;margin:0 auto;
+    background:var(--paper);border-top:3px solid var(--line);
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;gap:12px;
+    box-shadow:0 -4px 14px rgba(0,0,0,0.15);
+    transform:translateY(115%);transition:transform 0.25s ease;
+  }
+  .cart-bar.show{transform:translateY(0);}
+  .cart-bar .cart-info{flex:1;min-width:0;}
+  .cart-bar .cart-count{font-size:12.5px;color:#5b5140;}
+  .cart-bar .cart-total{font-family:'Baloo Thambi 2',sans-serif;font-weight:800;font-size:21px;color:var(--ink);}
+  .order-btn{
+    background:var(--whatsapp);color:#fff;border:none;border-radius:10px;
+    padding:14px 18px;font-weight:800;font-size:15px;font-family:'Baloo Thambi 2',sans-serif;
+    display:flex;align-items:center;gap:8px;white-space:nowrap;
+    box-shadow:0 3px 0 var(--whatsapp-dark);
+  }
+  .order-btn:active{transform:translateY(2px);box-shadow:none;}
+
+  .footer-note{text-align:center;color:#8a7c5c;font-size:12px;padding:24px 20px 10px;}
+
+  /* ---- admin link list ---- */
+  .admin-list{padding:20px 20px 40px;}
+  .admin-list h2{font-family:'Baloo Thambi 2',sans-serif;font-size:20px;margin-bottom:14px;}
+  .admin-row{background:var(--paper);border:2px solid var(--line);border-radius:9px;padding:12px 14px;margin-bottom:10px;}
+  .admin-row .n{font-weight:800;margin-bottom:3px;}
+  .admin-row .l{font-size:13px;word-break:break-all;color:var(--maroon-dark);}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<div class="cart-bar" id="cartBar">
+  <div class="cart-info">
+    <div class="cart-count" id="cartCount">0 பொருட்கள்</div>
+    <div class="cart-total" id="cartTotal">₹0</div>
+  </div>
+  <button class="order-btn" id="orderBtn">🟢 WhatsApp-ல் ஆர்டர்</button>
+</div>
+
+<script>
+(function(){
+  // ---- Shop + product data -------------------------------------------
+  // Maintained by the app operator (not shop owners) for now. To add a
+  // real shop: add a new key here. The key becomes the URL: ?shop=<key>.
+  // "whatsapp" must be the shop's number with country code, digits only
+  // (e.g. India: 91 followed by the 10-digit number), no + or spaces.
+  // These three are DEMO placeholders — replace with the real 10 shops.
+  const SHOPS = {
+    "a-shop": {
+      name: "A மளிகை கடை",
+      area: "பஜார் தெரு",
+      whatsapp: "919999999901",
+      color: "maroon",
+      items: [
+        {name:"அரிசி (கிலோ)", price:55},
+        {name:"சர்க்கரை (கிலோ)", price:45},
+        {name:"தேநீர் பொடி (100gm)", price:60},
+        {name:"பால் பாக்கெட்", price:28},
+        {name:"பிஸ்கட் பாக்கெட்", price:10}
+      ]
+    },
+    "b-shop": {
+      name: "B ஸ்டோர்ஸ்",
+      area: "பேருந்து நிலையம் அருகில்",
+      whatsapp: "919999999902",
+      color: "green",
+      items: [
+        {name:"வெங்காயம் (கிலோ)", price:35},
+        {name:"உருளைக்கிழங்கு (கிலோ)", price:30},
+        {name:"தக்காளி (கிலோ)", price:25},
+        {name:"சோப்பு", price:15},
+        {name:"எண்ணெய் (லிட்டர்)", price:150}
+      ]
+    },
+    "c-shop": {
+      name: "C ஜெனரல் ஸ்டோர்",
+      area: "கோயில் தெரு",
+      whatsapp: "919999999903",
+      color: "mustard",
+      items: [
+        {name:"பருப்பு (கிலோ)", price:110},
+        {name:"உப்பு (பாக்கெட்)", price:20},
+        {name:"மஞ்சள்தூள் (100gm)", price:55},
+        {name:"மிளகாய்தூள் (100gm)", price:70},
+        {name:"நல்லெண்ணெய் (லிட்டர்)", price:220}
+      ]
+    }
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const app = $("app");
+  const cartBar = $("cartBar");
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  function getParams(){
+    return new URLSearchParams(window.location.search);
+  }
+
+  // ---- Directory view (no shop selected) -------------------------------
+  function renderDirectory(){
+    cartBar.classList.remove("show");
+    const shopIds = Object.keys(SHOPS);
+    const rows = shopIds.map(id => {
+      const s = SHOPS[id];
+      return `
+        <a class="signboard c-${s.color}" href="?shop=${encodeURIComponent(id)}">
+          <div class="shop-name">${escapeHtml(s.name)}</div>
+          <div class="shop-tag">${escapeHtml(s.area)}</div>
+          <div class="shop-arrow">➜</div>
+        </a>`;
+    }).join("");
+
+    app.innerHTML = `
+      <div class="directory-header">
+        <div class="eyebrow">பஜார் கடைகள்</div>
+        <h1>என்ன வேண்டும்?</h1>
+        <p>கடையை தேர்வு செய்து, பொருட்களை தேர்ந்தெடுத்து WhatsApp மூலம் ஆர்டர் செய்யுங்கள்</p>
+      </div>
+      <div class="signboard-list">${rows}</div>
+      <div class="footer-note">பணமும் டெலிவரியும் — கடையுடன் நேரடியாக</div>
+    `;
+  }
+
+  // ---- Shop catalog view -------------------------------------------------
+  let cart = {}; // { itemIndex: qty }
+
+  function renderShop(shopId){
+    const shop = SHOPS[shopId];
+    if(!shop){
+      app.innerHTML = `<div class="empty-note">இந்த கடை கிடைக்கவில்லை.<br><br><a href="?">← எல்லா கடைகளும்</a></div>`;
+      cartBar.classList.remove("show");
+      return;
+    }
+    cart = {};
+
+    app.innerHTML = `
+      <div class="shop-header">
+        <a class="back-link" href="?">← எல்லா கடைகளும்</a>
+        <h1>${escapeHtml(shop.name)}</h1>
+        <div class="shop-sub">${escapeHtml(shop.area)}</div>
+      </div>
+      <div class="item-list" id="itemList"></div>
+      <div class="footer-note">பணமும் டெலிவரியும் — கடையுடன் நேரடியாக ஏற்பாடு செய்யவும்</div>
+    `;
+
+    renderItemList(shop);
+    updateCartBar(shop);
+  }
+
+  function renderItemList(shop){
+    const listEl = $("itemList");
+    listEl.innerHTML = shop.items.map((it, idx) => {
+      const qty = cart[idx] || 0;
+      return `
+        <div class="item-row" data-idx="${idx}">
+          <div class="item-name">${escapeHtml(it.name)}</div>
+          <div class="item-right">
+            <span class="price-tag">₹${it.price}</span>
+            ${qty === 0
+              ? `<button class="add-btn" data-idx="${idx}">+ சேர்</button>`
+              : `<div class="qty-stepper">
+                   <button data-action="dec" data-idx="${idx}">−</button>
+                   <span class="qty-val">${qty}</span>
+                   <button data-action="inc" data-idx="${idx}">+</button>
+                 </div>`
+            }
+          </div>
+        </div>`;
+    }).join("");
+
+    listEl.querySelectorAll(".add-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        cart[btn.dataset.idx] = 1;
+        renderItemList(shop);
+        updateCartBar(shop);
+      });
+    });
+    listEl.querySelectorAll("[data-action]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx = btn.dataset.idx;
+        if(btn.dataset.action === "inc"){
+          cart[idx] = (cart[idx]||0) + 1;
+        } else {
+          cart[idx] = (cart[idx]||0) - 1;
+          if(cart[idx] <= 0) delete cart[idx];
+        }
+        renderItemList(shop);
+        updateCartBar(shop);
+      });
+    });
+  }
+
+  function updateCartBar(shop){
+    const entries = Object.keys(cart);
+    if(entries.length === 0){
+      cartBar.classList.remove("show");
+      return;
+    }
+    let total = 0, count = 0;
+    entries.forEach(idx=>{
+      total += shop.items[idx].price * cart[idx];
+      count += cart[idx];
+    });
+    $("cartCount").textContent = entries.length + " வகை (" + count + " பொருட்கள்)";
+    $("cartTotal").textContent = "₹" + total.toFixed(0);
+    cartBar.classList.add("show");
+
+    $("orderBtn").onclick = () => {
+      const lines = ["வணக்கம், " + shop.name + "-ல் இருந்து ஆர்டர் செய்ய விரும்புகிறேன்:", ""];
+      entries.forEach(idx=>{
+        const it = shop.items[idx];
+        lines.push("• " + it.name + " x" + cart[idx] + " - ₹" + (it.price*cart[idx]).toFixed(0));
+      });
+      lines.push("", "மொத்தம்: ₹" + total.toFixed(0), "", "(டெலிவரி விலாசம் மற்றும் நேரம் இங்கே சொல்லவும்)");
+      window.open("https://wa.me/" + shop.whatsapp + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+    };
+  }
+
+  // ---- Admin view: lists every shop's direct link, for generating QR
+  // codes / sharing via WhatsApp. Visit as ?admin=1 — not linked from the
+  // normal customer-facing pages.
+  function renderAdmin(){
+    cartBar.classList.remove("show");
+    const base = window.location.origin + window.location.pathname;
+    const rows = Object.keys(SHOPS).map(id => {
+      const s = SHOPS[id];
+      const link = base + "?shop=" + encodeURIComponent(id);
+      return `<div class="admin-row"><div class="n">${escapeHtml(s.name)}</div><div class="l">${escapeHtml(link)}</div></div>`;
+    }).join("");
+    app.innerHTML = `
+      <div class="admin-list">
+        <h2>கடைகளின் நேரடி Link (QR-க்கு)</h2>
+        ${rows}
+      </div>`;
+  }
+
+  // ---- Init --------------------------------------------------------------
+  function init(){
+    const params = getParams();
+    if(params.get("admin") === "1"){
+      renderAdmin();
+    } else if(params.get("shop")){
+      renderShop(params.get("shop"));
+    } else {
+      renderDirectory();
+    }
+  }
+
+  window.addEventListener("popstate", init);
+  init();
+})();
+</script>
+</body>
+</html>
