@@ -166,6 +166,53 @@
   .admin-row .n{font-weight:800;margin-bottom:4px;text-align:left;}
   .admin-row .l{font-size:13px;word-break:break-all;color:var(--maroon-dark);text-align:left;margin-bottom:10px;}
   .admin-qr{width:160px;height:160px;border:2px solid var(--line);border-radius:8px;background:#fff;padding:6px;}
+
+  /* ---- Per-shop admin (PIN gate + product management) ---- */
+  .pin-gate-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;padding:20px;}
+  .pin-box{
+    max-width:320px;width:100%;background:var(--paper);border:2px solid var(--line);
+    border-radius:14px;padding:26px 22px;text-align:center;
+  }
+  .pin-box .pin-title{font-family:'Baloo Thambi 2',sans-serif;font-weight:800;font-size:19px;margin-bottom:6px;}
+  .pin-box .pin-sub{font-size:13.5px;color:#5b5140;margin-bottom:16px;line-height:1.5;}
+  .pin-box input{
+    width:100%;text-align:center;letter-spacing:6px;font-size:22px;padding:12px;
+    border:2px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);
+    font-family:'Baloo Thambi 2',sans-serif;
+  }
+  .pin-box .pin-error{color:var(--maroon);font-size:13px;min-height:18px;margin-top:8px;}
+  .pin-submit-btn{
+    width:100%;margin-top:14px;background:var(--maroon);color:var(--paper);border:none;
+    border-radius:9px;padding:13px;font-weight:700;font-size:16px;font-family:'Baloo Thambi 2',sans-serif;
+  }
+  .pin-submit-btn:active{background:var(--maroon-dark);}
+
+  .admin-panel{padding:16px 18px 40px;}
+  .admin-panel .field-label{font-size:13.5px;color:#5b5140;margin:14px 0 6px;font-weight:600;}
+  .admin-panel input{
+    width:100%;padding:11px 12px;border:2px solid var(--line);border-radius:9px;
+    background:var(--paper);color:var(--ink);font-size:15px;font-family:'Noto Sans Tamil',sans-serif;
+  }
+  .admin-add-btn{
+    width:100%;margin-top:12px;background:var(--green);color:var(--paper);border:none;
+    border-radius:9px;padding:12px;font-weight:700;font-size:15px;font-family:'Baloo Thambi 2',sans-serif;
+  }
+  .admin-add-btn:active{background:var(--green-dark);}
+  .admin-item-row{
+    display:flex;align-items:center;gap:10px;background:var(--paper);border:2px solid var(--line);
+    border-radius:9px;padding:10px 12px;margin-bottom:9px;
+  }
+  .admin-item-row .info{flex:1;font-size:14.5px;}
+  .admin-item-row .info b{color:var(--maroon-dark);}
+  .admin-del-btn{
+    background:none;border:2px solid rgba(122,42,29,0.4);color:var(--maroon);
+    border-radius:8px;width:34px;height:34px;font-size:15px;flex-shrink:0;
+  }
+  .admin-save-status{font-size:13px;color:#5b5140;min-height:18px;margin-top:8px;text-align:center;}
+  .admin-panel-header{
+    background:var(--green);color:var(--paper);padding:14px 18px;margin:-16px -18px 8px;
+    font-family:'Baloo Thambi 2',sans-serif;font-weight:800;font-size:18px;
+  }
 </style>
 </head>
 <body>
@@ -198,6 +245,7 @@
       whatsapp: "919999999901",
       color: "maroon",
       logo: "",
+      pin: "1111",
       items: [
         {name:"அரிசி (கிலோ)", price:55, img:""},
         {name:"சர்க்கரை (கிலோ)", price:45, img:""},
@@ -209,9 +257,10 @@
     "b-shop": {
       name: "B ஸ்டோர்ஸ்",
       area: "பேருந்து நிலையம் அருகில்",
-      whatsapp: "919360457996",
+      whatsapp: "919999999902",
       color: "green",
       logo: "",
+      pin: "2222",
       items: [
         {name:"வெங்காயம் (கிலோ)", price:35, img:""},
         {name:"உருளைக்கிழங்கு (கிலோ)", price:30, img:""},
@@ -226,6 +275,7 @@
       whatsapp: "919999999903",
       color: "mustard",
       logo: "",
+      pin: "3333",
       items: [
         {name:"பருப்பு (கிலோ)", price:110, img:""},
         {name:"உப்பு (பாக்கெட்)", price:20, img:""},
@@ -235,6 +285,94 @@
       ]
     }
   };
+
+  // ---- Live cloud catalog (Firebase) ---------------------------------
+  // Lets each shop owner add/edit/delete THEIR OWN products from their
+  // own admin link (?shop=<id>&admin=1), with changes appearing instantly
+  // for every customer — without touching this file or GitHub again.
+  //
+  // SETUP: create a NEW Firebase project (kept SEPARATE from any other
+  // app's Firebase project — this one needs public read access for
+  // browsing, which a private billing app's database should never have).
+  // Steps: console.firebase.google.com → Add project → Build → Realtime
+  // Database → Create Database → paste the config below → set these
+  // rules in the Rules tab:
+  //   {
+  //     "rules": {
+  //       "catalog": {
+  //         ".read": true,
+  //         "$shopId": { ".write": "auth != null" }
+  //       }
+  //     }
+  //   }
+  // Then Authentication → Sign-in method → enable "Anonymous".
+  const firebaseConfig = {
+    apiKey: "PASTE_YOUR_API_KEY_HERE",
+    authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://PASTE_YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "PASTE_YOUR_PROJECT",
+    storageBucket: "PASTE_YOUR_PROJECT.firebasestorage.app",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
+  };
+  const FIREBASE_CONFIGURED = firebaseConfig.apiKey.indexOf("PASTE_") !== 0;
+
+  let fbDb = null;
+  let firebaseLoadPromise = null;
+
+  function loadScriptOnce(src){
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[data-src="' + src + '"]');
+      if(existing){ resolve(); return; }
+      const s = document.createElement("script");
+      s.src = src;
+      s.dataset.src = src;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("script load failed: " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  function ensureFirebaseLoaded(){
+    if(!FIREBASE_CONFIGURED) return Promise.reject(new Error("Firebase not configured yet"));
+    if(fbDb) return Promise.resolve(fbDb);
+    if(firebaseLoadPromise) return firebaseLoadPromise;
+    firebaseLoadPromise = (async () => {
+      if(typeof firebase === "undefined"){
+        await loadScriptOnce("https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js");
+        await loadScriptOnce("https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js");
+        await loadScriptOnce("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js");
+      }
+      if(!firebase.apps || firebase.apps.length === 0){
+        firebase.initializeApp(firebaseConfig);
+      }
+      if(!firebase.auth().currentUser){
+        await firebase.auth().signInAnonymously().catch(()=>{});
+      }
+      fbDb = firebase.database();
+      return fbDb;
+    })();
+    return firebaseLoadPromise;
+  }
+
+  // Returns this shop's live product list from the cloud, or null if
+  // Firebase isn't set up yet, or nothing has been saved for this shop
+  // yet — callers fall back to the local starting data in that case.
+  async function fetchCloudItems(shopId){
+    try{
+      const db = await ensureFirebaseLoaded();
+      const snap = await db.ref("catalog/" + encodeURIComponent(shopId) + "/items").once("value");
+      const val = snap.val();
+      return Array.isArray(val) ? val : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  async function saveCloudItems(shopId, items){
+    const db = await ensureFirebaseLoaded();
+    await db.ref("catalog/" + encodeURIComponent(shopId) + "/items").set(items);
+  }
 
   const $ = (id) => document.getElementById(id);
   const app = $("app");
@@ -297,6 +435,7 @@
 
   // ---- Shop catalog view -------------------------------------------------
   let cart = {}; // { itemIndex: qty }
+  let currentShopItems = []; // the item list actually being shown right now
 
   function renderShop(shopId){
     const shop = SHOPS[shopId];
@@ -306,6 +445,7 @@
       return;
     }
     cart = {};
+    currentShopItems = shop.items; // show something instantly, don't block on network
 
     app.innerHTML = `
       <div class="shop-header">
@@ -319,12 +459,23 @@
 
     renderItemList(shop);
     updateCartBar(shop);
+
+    // Then check for a live cloud version (the shop owner's own edits)
+    // and swap it in silently if one exists — no loading spinner needed,
+    // this just quietly upgrades what's already on screen.
+    fetchCloudItems(shopId).then(cloudItems => {
+      if(cloudItems && cloudItems.length > 0){
+        currentShopItems = cloudItems;
+        renderItemList(shop);
+        updateCartBar(shop);
+      }
+    });
   }
 
   function renderItemList(shop, bumpIdx){
     const listEl = $("itemList");
     const colorHex = SHOP_COLOR_HEX[shop.color] || SHOP_COLOR_HEX.maroon;
-    listEl.innerHTML = shop.items.map((it, idx) => {
+    listEl.innerHTML = currentShopItems.map((it, idx) => {
       const qty = cart[idx] || 0;
       return `
         <div class="item-row" data-idx="${idx}">
@@ -388,7 +539,7 @@
     }
     let total = 0, count = 0;
     entries.forEach(idx=>{
-      total += shop.items[idx].price * cart[idx];
+      total += currentShopItems[idx].price * cart[idx];
       count += cart[idx];
     });
     $("cartCount").textContent = entries.length + " வகை (" + count + " பொருட்கள்)";
@@ -398,7 +549,7 @@
     $("orderBtn").onclick = () => {
       const lines = ["வணக்கம், " + shop.name + "-ல் இருந்து ஆர்டர் செய்ய விரும்புகிறேன்:", ""];
       entries.forEach(idx=>{
-        const it = shop.items[idx];
+        const it = currentShopItems[idx];
         lines.push("• " + it.name + " x" + cart[idx] + " - ₹" + (it.price*cart[idx]).toFixed(0));
       });
       lines.push("", "மொத்தம்: ₹" + total.toFixed(0), "", "(டெலிவரி விலாசம் மற்றும் நேரம் இங்கே சொல்லவும்)");
@@ -433,13 +584,132 @@
       </div>`;
   }
 
+  // ---- Per-shop admin: PIN-gated product management. Reached via
+  // ?shop=<id>&admin=1 — a link the shop owner keeps to themselves.
+  // Products they add/edit/delete here save straight to Firebase and
+  // appear for customers immediately, no file upload needed.
+  let adminItemsCache = [];
+  let adminCurrentShopId = null;
+
+  function renderShopAdmin(shopId){
+    const shop = SHOPS[shopId];
+    cartBar.classList.remove("show");
+    if(!shop){
+      app.innerHTML = `<div class="empty-note">இந்த கடை கிடைக்கவில்லை.</div>`;
+      return;
+    }
+    adminCurrentShopId = shopId;
+
+    if(!FIREBASE_CONFIGURED){
+      app.innerHTML = `<div class="empty-note">
+        இந்த அம்சம் இன்னும் அமைக்கப்படவில்லை.<br><br>
+        (Firebase Cloud திட்டம் இணைக்கப்பட வேண்டும் — app operator-ஐ தொடர்பு கொள்ளவும்.)
+      </div>`;
+      return;
+    }
+
+    app.innerHTML = `
+      <div class="pin-gate-wrap" id="pinGateWrap">
+        <div class="pin-box">
+          <div class="pin-title">${escapeHtml(shop.name)}</div>
+          <div class="pin-sub">உங்கள் PIN Number-ஐ இடவும்</div>
+          <input type="password" id="pinInput" inputmode="numeric" placeholder="PIN" maxlength="8">
+          <button class="pin-submit-btn" id="pinSubmitBtn">திற</button>
+          <div class="pin-error" id="pinError"></div>
+        </div>
+      </div>
+      <div id="adminPanelWrap" style="display:none;"></div>
+    `;
+
+    $("pinSubmitBtn").addEventListener("click", () => {
+      const entered = $("pinInput").value.trim();
+      if(entered && entered === (shop.pin || "")){
+        $("pinGateWrap").style.display = "none";
+        $("adminPanelWrap").style.display = "block";
+        loadShopAdminPanel(shopId, shop);
+      } else {
+        $("pinError").textContent = "தவறான PIN. மீண்டும் முயற்சிக்கவும்.";
+      }
+    });
+    $("pinInput").addEventListener("keydown", (e) => {
+      if(e.key === "Enter") $("pinSubmitBtn").click();
+    });
+  }
+
+  async function loadShopAdminPanel(shopId, shop){
+    const wrap = $("adminPanelWrap");
+    wrap.innerHTML = `<div class="empty-note">ஏற்றுகிறோம்...</div>`;
+    const cloudItems = await fetchCloudItems(shopId);
+    adminItemsCache = (cloudItems && cloudItems.length > 0) ? cloudItems.slice() : shop.items.slice();
+    renderShopAdminPanel(shopId, shop);
+  }
+
+  function renderShopAdminPanel(shopId, shop){
+    const wrap = $("adminPanelWrap");
+    const rows = adminItemsCache.map((it, idx) => `
+      <div class="admin-item-row">
+        <div class="info">${escapeHtml(it.name)} — <b>₹${it.price}</b></div>
+        <button class="admin-del-btn" data-idx="${idx}">🗑️</button>
+      </div>
+    `).join("") || `<div class="empty-note" style="margin:10px 0;">இன்னும் பொருட்கள் இல்லை.</div>`;
+
+    wrap.innerHTML = `
+      <div class="admin-panel">
+        <div class="admin-panel-header">${escapeHtml(shop.name)} — பொருட்கள் நிர்வாகம்</div>
+        <div id="adminItemList">${rows}</div>
+
+        <div class="field-label">புதிய பொருள் பெயர்</div>
+        <input type="text" id="newProdName" placeholder="எ.கா. அரிசி (கிலோ)">
+        <div class="field-label">விலை (₹)</div>
+        <input type="number" id="newProdPrice" inputmode="decimal" placeholder="எ.கா. 55">
+        <button class="admin-add-btn" id="addProdBtn">+ பொருள் சேர்</button>
+        <div class="admin-save-status" id="adminSaveStatus"></div>
+      </div>
+    `;
+
+    wrap.querySelectorAll(".admin-del-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        adminItemsCache.splice(parseInt(btn.dataset.idx), 1);
+        await persistAdminItems(shopId);
+        renderShopAdminPanel(shopId, shop);
+      });
+    });
+
+    $("addProdBtn").addEventListener("click", async () => {
+      const name = $("newProdName").value.trim();
+      const price = parseFloat($("newProdPrice").value);
+      if(!name || isNaN(price) || price <= 0){
+        $("adminSaveStatus").textContent = "பொருள் பெயரும் விலையும் சரியாக இடவும்";
+        return;
+      }
+      adminItemsCache.push({name, price, img:""});
+      await persistAdminItems(shopId);
+      renderShopAdminPanel(shopId, shop);
+    });
+  }
+
+  async function persistAdminItems(shopId){
+    const statusEl = $("adminSaveStatus");
+    if(statusEl) statusEl.textContent = "சேமிக்கப்படுகிறது...";
+    try{
+      await saveCloudItems(shopId, adminItemsCache);
+      if(statusEl) statusEl.textContent = "✅ சேமிக்கப்பட்டது";
+    }catch(e){
+      alert("சேமிக்க முடியவில்லை. இணைய இணைப்பை சரிபார்க்கவும்.");
+    }
+  }
+
   // ---- Init --------------------------------------------------------------
   function init(){
     const params = getParams();
-    if(params.get("admin") === "1"){
+    const shopId = params.get("shop");
+    const isAdmin = params.get("admin") === "1";
+    if(shopId && isAdmin){
+      renderShopAdmin(shopId);
+    } else if(isAdmin){
       renderAdmin();
-    } else if(params.get("shop")){
-      renderShop(params.get("shop"));
+    } else if(shopId){
+      renderShop(shopId);
     } else {
       renderDirectory();
     }
