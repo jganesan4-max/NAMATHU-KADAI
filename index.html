@@ -563,7 +563,7 @@
     cartBar.classList.add("show");
 
     $("orderBtn").onclick = () => {
-      const lines = ["வணக்கம், " + shop.name + "-ல் இருந்து ஆர்டர் செய்ய விரும்புகிறேன்:", ""];
+      const lines = ["வணக்கம், உங்கள் கடையில் இருந்து ஆர்டர் செய்ய விரும்புகிறேன்:", ""];
       entries.forEach(idx=>{
         const it = currentShopItems[idx];
         lines.push("• " + it.name + " x" + cart[idx] + " - ₹" + (it.price*cart[idx]).toFixed(0));
